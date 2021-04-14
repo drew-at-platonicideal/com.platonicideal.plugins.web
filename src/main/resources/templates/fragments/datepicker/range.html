@@ -1,5 +1,61 @@
+<a id="subtract-two-days" class="btn" href="#" role="button">
+    <i class="fa fa-angle-double-left"></i>
+</a>
+<a id="subtract-day" class="btn" href="#" role="button">
+    <i class="fa fa-angle-left"></i>
+</a>
 <span class="input-group-text">From</span>
 <input type="text" class="input-sm form-control datepicker" id="date_from" placeholder="From date"/>
 <span class="input-group-text">to</span>
 <input type="text" class="input-sm form-control datepicker" id="date_to" placeholder="To date"/>
+<a id="add-day" class="btn" href="#" role="button">
+    <i class="fa fa-angle-right"></i>
+</a>
+<a id="add-two-days" class="btn" href="#" role="button">
+    <i class="fa fa-angle-double-right"></i>
+</a>
+
 <span th:replace="fragments/datepicker/default"></span>
+<script>
+const MILLIS_PER_SECOND = 1000;
+const SECONDS_PER_MINUTE = 60;
+const MINUTES_PER_HOUR = 60;
+const HOURS_PER_DAY = 24;
+const MILLIS_PER_DAY = MILLIS_PER_SECOND * SECONDS_PER_MINUTE * MINUTES_PER_HOUR * HOURS_PER_DAY;
+    
+$(document).ready(function() {
+    $("#subtract-two-days").on("click", function() {
+       _addToDateRange(-2); 
+    });
+    $("#subtract-day").on("click", function() {
+        _addToDateRange(-1); 
+    });
+    $("#add-day").on("click", function() {
+        _addToDateRange(1); 
+    });
+    $("#add-two-days").on("click", function() {
+        _addToDateRange(2);
+    });
+    
+    
+    function _addToDateRange(val) {
+        let fromDateVal = $('#date_from').val();
+        let toDateVal = $('#date_to').val();
+        if(fromDateVal && toDateVal) {
+            let fromDate = new Date(fromDateVal);
+            let toDate = new Date(toDateVal);
+            let delta = (val * MILLIS_PER_DAY);
+            fromDate.setTime(fromDate.getTime() + delta);
+            toDate.setTime(toDate.getTime() + delta);
+            $('#date_from').val(_formatDate(fromDate));
+            $('#date_to').val(_formatDate(toDate));
+        }        
+    }
+    
+    function _formatDate(val) {
+        let month = val.getUTCMonth() + 1;
+        let date = val.getUTCDate();
+        return val.getUTCFullYear() + "-" + (month >= 10 ? month : "0" + month) + "-" + (date >= 10 ? date : "0" + date);
+    }
+});
+</script>
