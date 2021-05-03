@@ -24,6 +24,13 @@ const HOURS_PER_DAY = 24;
 const MILLIS_PER_DAY = MILLIS_PER_SECOND * SECONDS_PER_MINUTE * MINUTES_PER_HOUR * HOURS_PER_DAY;
     
 $(document).ready(function() {
+    $('#date_from').datepicker({
+        "format":"yyyy-mm-dd" 
+    });
+    $('#date_to').datepicker({
+        "format":"yyyy-mm-dd" 
+    });
+    
     $("#subtract-two-days").on("click", function() {
        _addToDateRange(-2); 
     });
