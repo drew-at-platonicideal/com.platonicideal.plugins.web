@@ -15,7 +15,6 @@
 	<properties>
 		<org.springframework.boot_spring-boot-starter-web.version>2.4.3</org.springframework.boot_spring-boot-starter-web.version>
 		<org.springframework.boot_spring-boot-starter-thymeleaf.version>2.4.3</org.springframework.boot_spring-boot-starter-thymeleaf.version>
-		<org.reflections.reflections.version>0.9.12</org.reflections.reflections.version>
 	</properties>
 
 	<dependencies>
@@ -28,12 +27,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>
 			<version>${org.springframework.boot_spring-boot-starter-thymeleaf.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.reflections</groupId>
-			<artifactId>reflections</artifactId>
-			<version>${org.reflections.reflections.version}</version>
 		</dependency>
 	</dependencies>
 </project>

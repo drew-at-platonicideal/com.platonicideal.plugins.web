@@ -1,12 +1,18 @@
 package com.platonicideal.plugins.web;
 
-import java.lang.reflect.Method;
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.reflections.Reflections;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,36 +20,67 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.thymeleaf.util.ListUtils;
 
 @Controller
 public class EndpointsController {
 
-	private final Reflections endpointScanner;
-
-	@Autowired
-	public EndpointsController(Reflections endpointScanner) {
-		this.endpointScanner = endpointScanner;
+	@RequestMapping(value = "/endpoints", method = RequestMethod.GET, produces = { MediaType.APPLICATION_JSON_VALUE })
+	@ResponseBody
+	public List<EndpointDescription> getEndpoints(
+			@RequestParam(required = false, defaultValue = "") String containing) throws ClassNotFoundException, IOException, URISyntaxException {
+		List<EndpointDescription> endpoints = 
+				getClasses("com.platonicideal").stream()
+					.flatMap(klazz -> Arrays.asList(klazz.getMethods()).stream())
+					.map(m -> m.getAnnotation(GetMapping.class))
+					.filter(an -> an != null)
+					.filter(an -> an.value()[0].contains(containing))
+					.map(EndpointDescription::describedBy)
+					.collect(Collectors.toList());
+		Collections.sort(endpoints);
+		return endpoints;
 	}
-	
-	@RequestMapping(value = "/endpoints", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE })
-    @ResponseBody
-    public List<EndpointDescription> getEndpoints(@RequestParam(required = false, defaultValue = "") String containing) {
-		Set<Method> methods = endpointScanner.getMethodsAnnotatedWith(GetMapping.class);
-		List<EndpointDescription> endpoints = methods.stream()
-				.map(EndpointDescription::describedBy)
-				.filter((d) -> d.contains(containing))
-				.collect(Collectors.toList());
-		return ListUtils.sort(endpoints);
-    }
-	
+
+	private Collection<Class<?>> getClasses(String packageName) throws ClassNotFoundException, IOException, URISyntaxException {
+		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+		String path = packageName.replace('.', '/');
+		Enumeration<URL> resources = classLoader.getResources(path);
+		List<File> dirs = new ArrayList<File>();
+		while (resources.hasMoreElements()) {
+			URL resource = resources.nextElement();
+			URI uri = new URI(resource.toString());
+			dirs.add(new File(uri.getPath()));
+		}
+		List<Class<?>> classes = new ArrayList<>();
+		for (File directory : dirs) {
+			classes.addAll(findClasses(directory, packageName));
+		}
+
+		return classes;
+	}
+
+	private List<Class<?>> findClasses(File directory, String packageName) throws ClassNotFoundException {
+		List<Class<?>> classes = new ArrayList<>();
+		if (!directory.exists()) {
+			return classes;
+		}
+		File[] files = directory.listFiles();
+		for (File file : files) {
+			if (file.isDirectory()) {
+				classes.addAll(findClasses(file, packageName + "." + file.getName()));
+			} else if (file.getName().endsWith(".class")) {
+				classes.add(Class.forName(packageName + '.' + file.getName().substring(0, file.getName().length() - 6)));
+			}
+		}
+		return classes;
+	}
+
 	private static class EndpointDescription implements Comparable<EndpointDescription> {
 		public final String url;
 		public final String name;
-		
-		public static EndpointDescription describedBy(Method m) {
-			String url = m.getDeclaredAnnotation(GetMapping.class).value()[0];
-			String name =  m.getDeclaredAnnotation(GetMapping.class).name();
+
+		public static EndpointDescription describedBy(GetMapping m) {
+			String url = m.value()[0];
+			String name = m.name();
 			return new EndpointDescription(url, name != null ? name : "");
 		}
 		
@@ -52,17 +89,13 @@ public class EndpointsController {
 			this.name = name;
 		}
 
-		public boolean contains(String v) {
-			return this.url.contains(v) || this.name.contains(v);
-		}
-		
 		@Override
 		public int compareTo(EndpointDescription o) {
-			if(this.name.compareTo(o.name) != 0) {
+			if (this.name.compareTo(o.name) != 0) {
 				return this.name.compareTo(o.name);
 			}
 			return this.url.compareTo(o.url);
 		}
 	}
-	
+
 }
