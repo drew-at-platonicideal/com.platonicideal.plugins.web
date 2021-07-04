@@ -1,5 +1,7 @@
 package com.platonicideal.plugins.web;
 
+import java.util.concurrent.Executors;
+
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
@@ -15,6 +17,7 @@ public class WebConfig {
 	@Bean
 	public Reflections piScanner() {
 		return new Reflections(new ConfigurationBuilder()
+				.setExecutorService(Executors.newFixedThreadPool(1))
 				.setUrls(ClasspathHelper.forPackage("com.platonicideal"))
 				.setScanners(new MethodAnnotationsScanner(),
 						     new TypeAnnotationsScanner())
