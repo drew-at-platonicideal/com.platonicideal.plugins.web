@@ -31,7 +31,7 @@ public class EndpointsController {
     public List<EndpointDescription> getEndpoints(@RequestParam(required = false, defaultValue = "") String containing) {
 		Set<Method> methods = endpointScanner.getMethodsAnnotatedWith(GetMapping.class);
 		List<EndpointDescription> endpoints = methods.stream()
-				.map(m -> new EndpointDescription(m.getDeclaredAnnotation(GetMapping.class).value()[0], ""))
+				.map(EndpointDescription::describedBy)
 				.filter((d) -> d.contains(containing))
 				.collect(Collectors.toList());
 		return ListUtils.sort(endpoints);
@@ -39,21 +39,27 @@ public class EndpointsController {
 	
 	private static class EndpointDescription implements Comparable<EndpointDescription> {
 		public final String url;
-		public final String description;
+		public final String name;
 		
-		public EndpointDescription(String url, String description) {
+		public static EndpointDescription describedBy(Method m) {
+			String url = m.getDeclaredAnnotation(GetMapping.class).value()[0];
+			String name =  m.getDeclaredAnnotation(GetMapping.class).name();
+			return new EndpointDescription(url, name != null ? name : "");
+		}
+		
+		private EndpointDescription(String url, String name) {
 			this.url = url;
-			this.description = description;
+			this.name = name;
 		}
 
 		public boolean contains(String v) {
-			return this.url.contains(v) || this.description.contains(v);
+			return this.url.contains(v) || this.name.contains(v);
 		}
 		
 		@Override
 		public int compareTo(EndpointDescription o) {
-			if(this.description.compareTo(o.description) != 0) {
-				return this.description.compareTo(o.description);
+			if(this.name.compareTo(o.name) != 0) {
+				return this.name.compareTo(o.name);
 			}
 			return this.url.compareTo(o.url);
 		}
