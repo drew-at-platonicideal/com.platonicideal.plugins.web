@@ -1,17 +1,22 @@
 <li class="nav-item dropdown">
-	<a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+	<a class="nav-link dropdown-toggle" href="#" id="navbarDropdownUtilitiesLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 		Utilities
 	</a>
-	<div id="navbar-utility-links" class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink"></div>
+	<div id="navbar-utility-links" class="dropdown-menu" aria-labelledby="navbarDropdownUtilitiesLink"></div>
 </li>
 
 <script>
 	$(document).ready(function() {
 		$.get("/endpoints?containing=utilities", function(data) {
-			let linksDiv = $("#navbar-utility-links");
-			data.filter(elem => elem.name).forEach(elem => {
-				linksDiv.append($("<a>").addClass("dropdown-item").attr("href", elem.url).text(elem.name));
-			});
+			if(data && data.length > 0) {
+				let linksDiv = $("#navbar-utility-links");
+				data.filter(elem => elem.name).forEach(elem => {
+					linksDiv.append($("<a>").addClass("dropdown-item").attr("href", elem.url).text(elem.name));
+				});				
+			} else {
+				$("#navbarDropdownUtilitiesLink").remove();
+				$("#navbar-utility-links").remove();
+			}
 	    });
 	});
 </script>

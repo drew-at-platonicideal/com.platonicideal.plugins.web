@@ -1,17 +1,22 @@
 <li class="nav-item dropdown">
-	<a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+	<a class="nav-link dropdown-toggle" href="#" id="navbarDropdownReportLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 		Reports
 	</a>
-	<div id="navbar-report-links" class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink"></div>
+	<div id="navbar-report-links" class="dropdown-menu" aria-labelledby="navbarDropdownReportLink"></div>
 </li>
 
 <script>
 	$(document).ready(function() {
-		$.get("/endpoints?containing=klaviyo", function(data) {
-			let linksDiv = $("#navbar-report-links");
-			data.filter(elem => elem.name).forEach(elem => {
-				linksDiv.append($("<a>").addClass("dropdown-item").attr("href", elem.url).text(elem.name));
-			});
+		$.get("/endpoints?containing=reports", function(data) {
+			if(data && data.length > 0) {
+				let linksDiv = $("#navbar-report-links");
+				data.filter(elem => elem.name).forEach(elem => {
+					linksDiv.append($("<a>").addClass("dropdown-item").attr("href", elem.url).text(elem.name));
+				});
+			} else {
+				$("#navbarDropdownReportLink").remove();
+				$("#navbar-report-links").remove();
+			}
 	    });
 	});
 </script>
