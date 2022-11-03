@@ -28,7 +28,6 @@ public class EndpointsController {
 	public List<EndpointDescription> getEndpoints(
 			@RequestParam(required = false, defaultValue = "") String containing) throws ClassNotFoundException, IOException, URISyntaxException {
 		Collection<Class<?>> klazzes = getClasses("com.platonicideal");
-		System.out.println(klazzes);
 		List<EndpointDescription> endpoints = 
 				klazzes.stream()
 					.flatMap(klazz -> Arrays.asList(klazz.getMethods()).stream())
