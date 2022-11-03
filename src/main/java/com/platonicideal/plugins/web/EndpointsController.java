@@ -34,7 +34,7 @@ public class EndpointsController {
 					.flatMap(klazz -> Arrays.asList(klazz.getMethods()).stream())
 					.map(m -> m.getAnnotation(GetMapping.class))
 					.filter(an -> an != null)
-					.filter(an -> an.value()[0].contains(containing))
+					.filter(an -> an.value()[0].toUpperCase().contains(containing.toUpperCase()))
 					.map(EndpointDescription::describedBy)
 					.collect(Collectors.toList());
 		Collections.sort(endpoints);

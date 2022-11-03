@@ -1,0 +1,22 @@
+<li class="nav-item dropdown" th:fragment="dropdown(dropDownName)">
+	<a class="nav-link dropdown-toggle" href="#" th:id="'navbarDropdown' + ${dropDownName} + 'Link'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+		[[${dropDownName}]]
+	</a>
+	<div th:id="'navbar-' + ${dropDownName} + '-links'" class="dropdown-menu" th:aria-labelledby="'navbarDropdown' + ${dropDownName} + 'Link'"></div>
+	
+<script>
+	$(document).ready(function() {
+		$.get("/endpoints?containing=[[${dropDownName}]]", function(data) {
+			if(data && data.length > 0) {
+				let linksDiv = $("#navbar-[[${dropDownName}]]-links");
+				data.filter(elem => elem.name).forEach(elem => {
+					linksDiv.append($("<a>").addClass("dropdown-item").attr("href", elem.url).text(elem.name));
+				});
+			} else {
+				$("#navbarDropdown[[${dropDownName}]]Link").remove();
+				$("#navbar-[[${dropDownName}]]-links").remove();
+			}
+	    });
+	});
+</script>
+</li>
