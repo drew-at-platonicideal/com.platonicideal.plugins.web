@@ -1,4 +1,4 @@
-<li class="nav-item dropdown" th:fragment="dropdown(dropDownName)">
+<li th:fragment="dropdown(dropDownName)" class="nav-item dropdown">
 	<a class="nav-link dropdown-toggle" href="#" th:id="'navbarDropdown' + ${dropDownName} + 'Link'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 		[[${dropDownName}]]
 	</a>
