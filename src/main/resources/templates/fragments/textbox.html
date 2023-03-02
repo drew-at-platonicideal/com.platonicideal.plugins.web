@@ -1,0 +1,6 @@
+<div th:fragment="textbox(textDisplay, textId, textPlaceholder)">
+	<span class="input-group-text" th:text="${textDisplay}"></span>
+</div>
+<input type="text" class="form-control" th:id="${textId}" th:placeholder="${textPlaceholder}" autocomplete="off" />
+
+
